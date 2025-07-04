@@ -1,24 +1,32 @@
 package com.example.kotobatap.ui.screens
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.res.Resources
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.JsPromptResult
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Button
+import android.widget.TextView
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.kotobatap.R
 import com.example.kotobatap.ui.components.AppHeader
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.net.URLEncoder
+import kotlin.math.min
 
 @Composable
 fun ReaderScreen(
@@ -48,87 +56,15 @@ fun ReaderScreen(
 
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
-                            view?.evaluateJavascript(
-                                """
-                                    function highlightJapaneseWords() {
-                                        const style = document.createElement('style');
-                                        style.textContent = `
-                                            .japanese-word {
-                                                background-color: #FFF59D;
-                                                border-radius: 3px;
-                                                padding: 0 2px;
-                                                margin: 0 1px;
-                                                box-shadow: 0 0 2px rgba(0,0,0,0.2);
-                                                transition: background-color 0.3s;
-                                            }
-                                            .japanese-word:hover {
-                                                background-color: #FFEE58;
-                                            }
-                                        `;
-                                        document.head.appendChild(style);
-                                    
-                                        function tokenizeJapanese(text) {
-                                            if (window.Intl && Intl.Segmenter) {
-                                                const segmenter = new Intl.Segmenter('ja-JP', { granularity: 'word' });
-                                                const segments = segmenter.segment(text);
-                                                return Array.from(segments).map(seg => seg.segment);
-                                            } else if (window.Intl && Intl.v8BreakIterator) {
-                                                const it = Intl.v8BreakIterator(['ja-JP'], {type: 'word'});
-                                                it.adoptText(text);
-                                                const words = [];
-                                                let cur = 0, prev = 0;
-                                                while (cur < text.length) {
-                                                    prev = cur;
-                                                    cur = it.next();
-                                                    words.push(text.substring(prev, cur));
-                                                }
-                                                return words;
-                                            }
-                                            return [text];
-                                        }
-                                    
-                                        function isJapanese(text) {
-                                            return /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3400-\u4DBF\uFF00-\uFFEF\u3000-\u303F]/.test(text);
-                                        }
-                                    
-                                        function walkTextNodes(node, callback) {
-                                            if (node.nodeType === Node.TEXT_NODE) {
-                                                callback(node);
-                                            } else {
-                                                for (let child of node.childNodes) {
-                                                    walkTextNodes(child, callback);
-                                                }
-                                            }
-                                        }
-                                    
-                                        walkTextNodes(document.body, (textNode) => {
-                                            const text = textNode.nodeValue;
-                                            if (!isJapanese(text)) return;
-                                    
-                                            const words = tokenizeJapanese(text);
-                                            const fragment = document.createDocumentFragment();
-                                    
-                                            words.forEach(word => {
-                                                if (isJapanese(word)) {
-                                                    const span = document.createElement('span');
-                                                    span.className = 'japanese-word';
-                                                    span.textContent = word;
-                                                    span.addEventListener('click', function(event) {
-                                                        event.stopPropagation();
-                                                        prompt('JISHO_LOOKUP',word)
-                                                    });
-                                                    fragment.appendChild(span);
-                                                } else {
-                                                    fragment.appendChild(document.createTextNode(word));
-                                                }
-                                            });
-                                            textNode.parentNode.replaceChild(fragment, textNode);
-                                        });
-                                    }
-                                    
-                                    highlightJapaneseWords();
-                                """.trimIndent(), null
-                            )
+                            super.onPageFinished(view, url)
+                            try {
+                                val inputStream = context.assets.open("js/highlightWords.js")
+                                val reader = inputStream.bufferedReader()
+                                val jsCode = reader.use { it.readText() }
+                                view?.evaluateJavascript(jsCode, null)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                     }
                     loadUrl(url)
@@ -159,37 +95,92 @@ class JishoInterface(
                 val response = client.newCall(request).execute()
                 val json = JSONObject(response.body?.string() ?: "{}")
 
-                val meanings = parseMeanings(json)
-                showAlert("$word\n\n${meanings.joinToString("\n• ")}")
+                val (meanings, hiragana) = parseMeanings(json)
+                showWordDetailsDialog(word, meanings, hiragana)
             } catch (e: Exception) {
                 showAlert("Error: ${e.message}")
             }
         }.start()
     }
 
-    private fun parseMeanings(json: JSONObject): List<String> {
+    private fun parseMeanings(json: JSONObject): Pair<List<String>, String?> {
         val meanings = mutableListOf<String>()
-        val data = json.optJSONArray("data") ?: return meanings
+        var hiragana: String? = null
 
-        for (i in 0 until data.length()) {
-            val entry = data.getJSONObject(i)
-            val senses = entry.getJSONArray("senses")
+        try {
+            val data = json.optJSONArray("data") ?: return Pair(meanings, hiragana)
 
-            for (j in 0 until senses.length()) {
-                senses.getJSONObject(j).getJSONArray("english_definitions").let { defs ->
-                    for (k in 0 until defs.length()) {
-                        meanings.add(defs.getString(k))
+            if (data.length() > 0) {
+                val entry = data.getJSONObject(0)
+
+                val japanese = entry.optJSONArray("japanese")
+                if (japanese != null && japanese.length() > 0) {
+                    hiragana = japanese.getJSONObject(0).optString("reading", null)
+                }
+
+                val senses = entry.optJSONArray("senses")
+                if (senses != null && senses.length() > 0) {
+                    val sense = senses.getJSONObject(0)
+
+                    val englishDefenitions = sense.optJSONArray("english_definitions")
+                    if (englishDefenitions != null) {
+                        for (k in 0 until min(englishDefenitions.length(), 5)) {
+                            englishDefenitions.optString(k)?.let {
+                                meanings.add(it)
+                            }
+                        }
                     }
                 }
             }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
-        return meanings.take(5)
+        return Pair(meanings, hiragana)
+    }
+
+    private fun showWordDetailsDialog(word: String, meanings: List<String>, hiragana: String?) {
+        Handler(Looper.getMainLooper()).post {
+            val builder = AlertDialog.Builder(context)
+            val inflater = LayoutInflater.from(context)
+            val dialogView = inflater.inflate(R.layout.dialog_word_details, null)
+
+            builder.setView(dialogView)
+
+            val tvWord: TextView = dialogView.findViewById(R.id.tvWord)
+            val tvMeanings: TextView = dialogView.findViewById(R.id.tvMeanings)
+            val tvHiragana: TextView = dialogView.findViewById(R.id.tvHiragana)
+            val closeButton: Button = dialogView.findViewById(R.id.closeButton)
+
+            tvWord.text = word
+            tvHiragana.text = hiragana ?: "No reading available"
+            tvMeanings.text = if (meanings.isNotEmpty()) {
+                "• " + meanings.joinToString("\n• ")
+            } else {
+                "No definitions found"
+            }
+
+            val dialog = builder.create()
+
+            val displayMetrics = context.resources.displayMetrics
+            val maxWidth = (displayMetrics.widthPixels * 0.9).toInt()
+            dialog.window?.setLayout(maxWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+            closeButton.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+        }
     }
 
     private fun showAlert(message: String) {
         Handler(Looper.getMainLooper()).post {
-            webView.evaluateJavascript("alert(`${message.replace("'", "\\'")}`);", null)
+            AlertDialog.Builder(context)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show()
         }
     }
 }

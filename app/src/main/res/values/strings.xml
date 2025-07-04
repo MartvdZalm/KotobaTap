@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Kotoba Tap</string>
+    <string name="close">Close</string>
+    <string name="meanings">Meanings</string>
+    <string name="word">Word</string>
+    <string name="hiragana">Hiragana</string>
 </resources>
