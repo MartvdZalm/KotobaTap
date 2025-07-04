@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.compose.rememberNavController
 import com.example.kotobatap.ui.navigation.AppNavHost
 import com.example.kotobatap.ui.theme.KotobaTapTheme
 
@@ -13,8 +14,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KotobaTapTheme {
-                AppNavHost()
+                val navController = rememberNavController()
+                AppNavHost(navController)
             }
         }
     }
 }
+
+

@@ -1,17 +1,17 @@
 package com.example.kotobatap.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kotobatap.ui.screens.HomeScreen
 import com.example.kotobatap.ui.screens.ReaderScreen
+import com.example.kotobatap.ui.screens.SettingsScreen
 
 @Composable
-fun AppNavHost() {
-    val navController = rememberNavController()
+fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
@@ -19,6 +19,7 @@ fun AppNavHost() {
     ) {
         composable("home") {
             HomeScreen(
+                navController = navController,
                 onNavigateToReader = { encodedUrl ->
                     navController.navigate("reader?url=$encodedUrl")
                 }
@@ -37,6 +38,10 @@ fun AppNavHost() {
                 url = backStackEntry.arguments?.getString("url") ?: "",
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }
