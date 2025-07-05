@@ -7,25 +7,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kotobatap.ui.components.AppHeader
-import com.example.kotobatap.viewmodels.SettingsViewModel
+import com.example.kotobatap.ui.components.ThemeDialog
 
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit
 ) {
-    val settingsViewModel: SettingsViewModel = viewModel()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -41,15 +41,14 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            SettingsSection(title = "Theme") {
+            SettingsSection("General") {
                 SettingItem(
-                    title = "Dark theme",
-                    description = "The description for the dark theme",
+                    title = "Theme",
+                    description = "Change theme of the app",
                     action = {
-                        Switch(
-                            checked = settingsViewModel.isDarkTheme,
-                            onCheckedChange = { settingsViewModel.toggleTheme() }
-                        )
+                        Button(onClick = { ThemeDialog.show(context) }) {
+                            Text("Change Theme")
+                        }
                     }
                 )
             }
