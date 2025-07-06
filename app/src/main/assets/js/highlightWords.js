@@ -4,7 +4,6 @@ function highlightJapaneseWords()
 
     style.textContent = `
         .japanese-word {
-            background-color: #FFF59D;
             border-radius: 3px;
             padding: 0 2px;
             margin: 0 1px;
@@ -77,6 +76,14 @@ function highlightJapaneseWords()
             }
         });
         textNode.parentNode.replaceChild(fragment, textNode);
+    });
+}
+
+function changeHighlightingColor(color)
+{
+    let elements = document.querySelectorAll('.japanese-word');
+    elements.forEach((element) => {
+        element.style.backgroundColor = color;
     });
 }
 

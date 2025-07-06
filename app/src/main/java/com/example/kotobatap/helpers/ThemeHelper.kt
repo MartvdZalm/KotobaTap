@@ -3,36 +3,44 @@ package com.example.kotobatap.helpers
 import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.edit
+import com.example.kotobatap.managers.DataStoreManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 object ThemeHelper {
     enum class Theme { LIGHT, DARK, SYSTEM }
 
-    private const val PREFS_NAME = "theme_prefs"
     private const val KEY_THEME = "app_theme"
 
-    fun applyTheme(activity: Activity, theme: Theme) {
+    suspend fun applyTheme(context: Context, theme: Theme) {
         val mode = when (theme) {
             Theme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
             Theme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
             Theme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
-        activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit {
-                putInt(KEY_THEME, mode)
-            }
-
+        DataStoreManager.putValue(context, KEY_THEME, mode)
         AppCompatDelegate.setDefaultNightMode(mode)
     }
 
-    fun getSavedTheme(context: Context): Theme {
-        val mode = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    suspend fun getSavedTheme(context: Context): Theme {
+        val mode = DataStoreManager.getIntValue(context, KEY_THEME).first()
+
         return when (mode) {
             AppCompatDelegate.MODE_NIGHT_NO -> Theme.LIGHT
             AppCompatDelegate.MODE_NIGHT_YES -> Theme.DARK
             else -> Theme.SYSTEM
+        }
+    }
+
+    fun observeTheme(context: Context): Flow<Theme> {
+        return DataStoreManager.getIntValue(context, KEY_THEME).map { mode ->
+            when (mode) {
+                AppCompatDelegate.MODE_NIGHT_NO -> Theme.LIGHT
+                AppCompatDelegate.MODE_NIGHT_YES -> Theme.DARK
+                else -> Theme.SYSTEM
+            }
         }
     }
 }

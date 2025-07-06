@@ -18,8 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.kotobatap.helpers.ReaderHelper
 import com.example.kotobatap.ui.components.AppHeader
 import com.example.kotobatap.ui.components.ThemeDialog
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
 @Composable
 fun SettingsScreen(
@@ -48,6 +51,29 @@ fun SettingsScreen(
                     action = {
                         Button(onClick = { ThemeDialog.show(context) }) {
                             Text("Change Theme")
+                        }
+                    }
+                )
+
+                SettingItem(
+                    title = "Highlighting",
+                    description = "Change the color of the highlighting",
+                    action = {
+                        Button(onClick = {
+                            ColorPickerDialog.Builder(context)
+                                .setTitle("ColorPicker Dialog")
+                                .setPreferenceName("MyColorPickerDialog")
+                                .setPositiveButton(
+                                    "Confirm",
+                                    ColorEnvelopeListener { envelope, fromUser ->
+                                        ReaderHelper.highlightingColor = "#${envelope.hexCode.substring(2)}"
+                                    })
+                                .setNegativeButton("Cancel") { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                .show()
+                        }) {
+                            Text("Change Color")
                         }
                     }
                 )

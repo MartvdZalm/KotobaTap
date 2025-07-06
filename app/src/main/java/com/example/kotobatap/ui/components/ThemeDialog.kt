@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.widget.RadioGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.kotobatap.R
 import com.example.kotobatap.helpers.ThemeHelper
+import kotlinx.coroutines.launch
 
 class ThemeDialog : DialogFragment() {
     private var selectedTheme = ThemeHelper.Theme.SYSTEM
@@ -18,10 +20,14 @@ class ThemeDialog : DialogFragment() {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_theme_selector, null)
         val radioGroup = view.findViewById<RadioGroup>(R.id.themeRadioGroup)
 
-        when (ThemeHelper.getSavedTheme(requireContext())) {
-            ThemeHelper.Theme.LIGHT -> radioGroup.check(R.id.lightThemeRadio)
-            ThemeHelper.Theme.DARK -> radioGroup.check(R.id.darkThemeRadio)
-            else -> radioGroup.check(R.id.systemDefaultRadio)
+        lifecycleScope.launch {
+            val currentTheme = ThemeHelper.getSavedTheme(requireContext())
+
+            when (currentTheme) {
+                ThemeHelper.Theme.LIGHT -> radioGroup.check(R.id.lightThemeRadio)
+                ThemeHelper.Theme.DARK -> radioGroup.check(R.id.darkThemeRadio)
+                else -> radioGroup.check(R.id.systemDefaultRadio)
+            }
         }
 
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -35,8 +41,10 @@ class ThemeDialog : DialogFragment() {
         return AlertDialog.Builder(requireContext())
             .setView(view)
             .setPositiveButton("Apply") { _, _ ->
-                ThemeHelper.applyTheme(requireActivity(), selectedTheme)
-                dismiss()
+                lifecycleScope.launch {
+                    ThemeHelper.applyTheme(requireActivity(), selectedTheme)
+                    dismiss()
+                }
             }
             .setNegativeButton("Cancel") { _, _ -> dismiss() }
             .create()

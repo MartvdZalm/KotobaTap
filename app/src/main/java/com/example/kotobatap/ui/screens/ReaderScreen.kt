@@ -2,7 +2,6 @@ package com.example.kotobatap.ui.screens
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.res.Resources
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.kotobatap.R
+import com.example.kotobatap.helpers.ReaderHelper
 import com.example.kotobatap.ui.components.AppHeader
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -62,6 +62,10 @@ fun ReaderScreen(
                                 val reader = inputStream.bufferedReader()
                                 val jsCode = reader.use { it.readText() }
                                 view?.evaluateJavascript(jsCode, null)
+                                view?.evaluateJavascript(
+                                    "changeHighlightingColor('${ReaderHelper.highlightingColor}')",
+                                    null
+                                )
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
