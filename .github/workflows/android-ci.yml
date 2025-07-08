@@ -23,4 +23,6 @@ jobs:
           distribution: 'temurin'
 
       - name: Run ktlint
-        run: ./gradlew ktlintCheck
+        run: |
+          chmod +x gradlew
+          ./gradlew ktlintCheck
