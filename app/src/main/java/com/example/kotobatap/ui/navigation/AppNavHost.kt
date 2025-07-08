@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.kotobatap.ui.screens.DictionaryScreen
 import com.example.kotobatap.ui.screens.HomeScreen
 import com.example.kotobatap.ui.screens.ReaderScreen
 import com.example.kotobatap.ui.screens.SettingsScreen
@@ -38,6 +39,10 @@ fun AppNavHost(navController: NavHostController) {
                 url = backStackEntry.arguments?.getString("url") ?: "",
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable("dictionary") {
+            DictionaryScreen(onBack = { navController.popBackStack() })
         }
 
         composable("settings") {
