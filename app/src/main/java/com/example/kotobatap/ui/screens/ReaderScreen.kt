@@ -126,10 +126,10 @@ class JishoInterface(
                 if (senses != null && senses.length() > 0) {
                     val sense = senses.getJSONObject(0)
 
-                    val englishDefenitions = sense.optJSONArray("english_definitions")
-                    if (englishDefenitions != null) {
-                        for (k in 0 until min(englishDefenitions.length(), 5)) {
-                            englishDefenitions.optString(k)?.let {
+                    val englishDefinitions = sense.optJSONArray("english_definitions")
+                    if (englishDefinitions != null) {
+                        for (k in 0 until min(englishDefinitions.length(), 5)) {
+                            englishDefinitions.optString(k)?.let {
                                 meanings.add(it)
                             }
                         }
