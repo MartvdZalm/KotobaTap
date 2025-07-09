@@ -49,7 +49,7 @@ fun dictionaryScreen(onBack: () -> Unit) {
             Button(
                 onClick = {},
                 enabled = userInput.isNotBlank(),
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             ) {
                 Text("Search")
             }
