@@ -9,12 +9,11 @@ import androidx.compose.runtime.produceState
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.example.kotobatap.helpers.ThemeHelper
-import com.example.kotobatap.ui.navigation.AppNavHost
-import com.example.kotobatap.ui.theme.KotobaTapTheme
+import com.example.kotobatap.ui.navigation.appNavHost
+import com.example.kotobatap.ui.theme.kotobaTapTheme
 import kotlinx.coroutines.flow.Flow
 
 class MainActivity : FragmentActivity() {
-
     private lateinit var themeFlow: Flow<ThemeHelper.Theme>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,22 +25,23 @@ class MainActivity : FragmentActivity() {
         setContent {
             val currentTheme by produceState<ThemeHelper.Theme?>(
                 initialValue = null,
-                key1 = themeFlow
+                key1 = themeFlow,
             ) {
                 themeFlow.collect { value = it }
             }
 
             if (currentTheme != null) {
-                val isDarkTheme = when (currentTheme) {
-                    ThemeHelper.Theme.LIGHT -> false
-                    ThemeHelper.Theme.DARK -> true
-                    ThemeHelper.Theme.SYSTEM -> isSystemInDarkTheme()
-                    else -> false
-                }
+                val isDarkTheme =
+                    when (currentTheme) {
+                        ThemeHelper.Theme.LIGHT -> false
+                        ThemeHelper.Theme.DARK -> true
+                        ThemeHelper.Theme.SYSTEM -> isSystemInDarkTheme()
+                        else -> false
+                    }
 
-                KotobaTapTheme(darkTheme = isDarkTheme) {
+                kotobaTapTheme(darkTheme = isDarkTheme) {
                     val navController = rememberNavController()
-                    AppNavHost(navController)
+                    appNavHost(navController)
                 }
             }
         }

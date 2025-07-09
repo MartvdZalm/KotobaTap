@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
 }
 
 android {
@@ -23,7 +24,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -38,6 +39,13 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+ktlint {
+    version = "1.0.0"
+    android = true
+    outputToConsole = true
+    outputColorName = "RED"
 }
 
 dependencies {

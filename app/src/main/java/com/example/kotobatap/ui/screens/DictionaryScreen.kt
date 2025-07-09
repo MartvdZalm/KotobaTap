@@ -1,5 +1,6 @@
 package com.example.kotobatap.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,37 +17,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.kotobatap.ui.components.AppHeader
+import com.example.kotobatap.ui.components.appHeader
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun DictionaryScreen(onBack: () -> Unit) {
+fun dictionaryScreen(onBack: () -> Unit) {
     var userInput by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
-            AppHeader(
+            appHeader(
                 title = "Dictionary",
                 showBackButton = true,
-                onBackClick = onBack
+                onBackClick = onBack,
             )
-        }
+        },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
         ) {
             OutlinedTextField(
                 value = userInput,
                 onValueChange = { userInput = it },
                 label = { Text("Japanese Characters") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Button(
                 onClick = {},
                 enabled = userInput.isNotBlank(),
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             ) {
                 Text("Search")
             }

@@ -1,52 +1,54 @@
 package com.example.kotobatap.ui.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.kotobatap.ui.screens.DictionaryScreen
-import com.example.kotobatap.ui.screens.HomeScreen
-import com.example.kotobatap.ui.screens.ReaderScreen
-import com.example.kotobatap.ui.screens.SettingsScreen
+import com.example.kotobatap.ui.screens.dictionaryScreen
+import com.example.kotobatap.ui.screens.homeScreen
+import com.example.kotobatap.ui.screens.readerScreen
+import com.example.kotobatap.ui.screens.settingsScreen
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun AppNavHost(navController: NavHostController) {
-
+fun appNavHost(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "home",
     ) {
         composable("home") {
-            HomeScreen(
+            homeScreen(
                 navController = navController,
                 onNavigateToReader = { encodedUrl ->
                     navController.navigate("reader?url=$encodedUrl")
-                }
+                },
             )
         }
         composable(
             "reader?url={url}",
-            arguments = listOf(
-                navArgument("url") {
-                    type = NavType.StringType
-                    nullable = false
-                }
-            )
+            arguments =
+                listOf(
+                    navArgument("url") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                ),
         ) { backStackEntry ->
-            ReaderScreen(
+            readerScreen(
                 url = backStackEntry.arguments?.getString("url") ?: "",
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
             )
         }
 
         composable("dictionary") {
-            DictionaryScreen(onBack = { navController.popBackStack() })
+            dictionaryScreen(onBack = { navController.popBackStack() })
         }
 
         composable("settings") {
-            SettingsScreen(onBack = { navController.popBackStack() })
+            settingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }

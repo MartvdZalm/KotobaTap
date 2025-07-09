@@ -20,44 +20,69 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app_preferences")
 
 object DataStoreManager {
-
-    suspend fun <T> putValue(context: Context, key: String, value: T) {
+    suspend fun <T> putValue(
+        context: Context,
+        key: String,
+        value: T,
+    ) {
         when (value) {
-            is String -> context.dataStore.edit { preferences ->
-                preferences[stringPreferencesKey(
-                    key
-                )] = value
-            }
+            is String ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        stringPreferencesKey(
+                            key,
+                        ),
+                    ] = value
+                }
 
-            is Int -> context.dataStore.edit { preferences ->
-                preferences[intPreferencesKey(key)] = value
-            }
+            is Int ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        intPreferencesKey(key),
+                    ] = value
+                }
 
-            is Boolean -> context.dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(
-                    key
-                )] = value
-            }
+            is Boolean ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        booleanPreferencesKey(
+                            key,
+                        ),
+                    ] = value
+                }
 
-            is Long -> context.dataStore.edit { preferences ->
-                preferences[longPreferencesKey(key)] = value
-            }
+            is Long ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        longPreferencesKey(key),
+                    ] = value
+                }
 
-            is Float -> context.dataStore.edit { preferences ->
-                preferences[floatPreferencesKey(key)] = value
-            }
+            is Float ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        floatPreferencesKey(key),
+                    ] = value
+                }
 
-            is Double -> context.dataStore.edit { preferences ->
-                preferences[doublePreferencesKey(
-                    key
-                )] = value
-            }
+            is Double ->
+                context.dataStore.edit { preferences ->
+                    preferences[
+                        doublePreferencesKey(
+                            key,
+                        ),
+                    ] = value
+                }
 
             else -> throw IllegalArgumentException("This type is not supported")
         }
     }
 
-    fun getStringValue(context: Context, key: String, defaultValue: String = ""): Flow<String> {
+    fun getStringValue(
+        context: Context,
+        key: String,
+        defaultValue: String = "",
+    ): Flow<String> {
         return context.dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -71,7 +96,11 @@ object DataStoreManager {
             }
     }
 
-    fun getIntValue(context: Context, key: String, defaultValue: Int = 0): Flow<Int> {
+    fun getIntValue(
+        context: Context,
+        key: String,
+        defaultValue: Int = 0,
+    ): Flow<Int> {
         return context.dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -88,7 +117,7 @@ object DataStoreManager {
     fun getBooleanValue(
         context: Context,
         key: String,
-        defaultValue: Boolean = false
+        defaultValue: Boolean = false,
     ): Flow<Boolean> {
         return context.dataStore.data
             .catch { exception ->
@@ -109,7 +138,10 @@ object DataStoreManager {
         }
     }
 
-    suspend fun removeKey(context: Context, key: String) {
+    suspend fun removeKey(
+        context: Context,
+        key: String,
+    ) {
         context.dataStore.edit { preferences ->
             preferences.remove(stringPreferencesKey(key))
         }
