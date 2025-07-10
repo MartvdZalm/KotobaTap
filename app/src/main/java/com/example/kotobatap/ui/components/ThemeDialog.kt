@@ -31,11 +31,12 @@ class ThemeDialog : DialogFragment() {
         }
 
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            selectedTheme = when (checkedId) {
-                R.id.lightThemeRadio -> ThemeHelper.Theme.LIGHT
-                R.id.darkThemeRadio -> ThemeHelper.Theme.DARK
-                else -> ThemeHelper.Theme.SYSTEM
-            }
+            selectedTheme =
+                when (checkedId) {
+                    R.id.lightThemeRadio -> ThemeHelper.Theme.LIGHT
+                    R.id.darkThemeRadio -> ThemeHelper.Theme.DARK
+                    else -> ThemeHelper.Theme.SYSTEM
+                }
         }
 
         return AlertDialog.Builder(requireContext())

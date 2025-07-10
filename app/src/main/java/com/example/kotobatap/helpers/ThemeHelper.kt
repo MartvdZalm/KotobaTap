@@ -1,6 +1,5 @@
 package com.example.kotobatap.helpers
 
-import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.kotobatap.managers.DataStoreManager
@@ -13,12 +12,16 @@ object ThemeHelper {
 
     private const val KEY_THEME = "app_theme"
 
-    suspend fun applyTheme(context: Context, theme: Theme) {
-        val mode = when (theme) {
-            Theme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
-            Theme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
-            Theme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-        }
+    suspend fun applyTheme(
+        context: Context,
+        theme: Theme,
+    ) {
+        val mode =
+            when (theme) {
+                Theme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                Theme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                Theme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
 
         DataStoreManager.putValue(context, KEY_THEME, mode)
         AppCompatDelegate.setDefaultNightMode(mode)

@@ -1,5 +1,6 @@
 package com.example.kotobatap.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,43 +20,43 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.kotobatap.helpers.ReaderHelper
-import com.example.kotobatap.ui.components.AppHeader
 import com.example.kotobatap.ui.components.ThemeDialog
+import com.example.kotobatap.ui.components.appHeader
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun SettingsScreen(
-    onBack: () -> Unit
-) {
+fun settingsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
-            AppHeader(
+            appHeader(
                 title = "Settings",
                 showBackButton = true,
-                onBackClick = onBack
+                onBackClick = onBack,
             )
-        }
+        },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState()),
         ) {
-            SettingsSection("General") {
-                SettingItem(
+            settingsSection("General") {
+                settingItem(
                     title = "Theme",
                     description = "Change theme of the app",
                     action = {
                         Button(onClick = { ThemeDialog.show(context) }) {
                             Text("Change Theme")
                         }
-                    }
+                    },
                 )
 
-                SettingItem(
+                settingItem(
                     title = "Highlighting",
                     description = "Change the color of the highlighting",
                     action = {
@@ -66,8 +67,10 @@ fun SettingsScreen(
                                 .setPositiveButton(
                                     "Confirm",
                                     ColorEnvelopeListener { envelope, fromUser ->
-                                        ReaderHelper.highlightingColor = "#${envelope.hexCode.substring(2)}"
-                                    })
+                                        ReaderHelper.highlightingColor =
+                                            "#${envelope.hexCode.substring(2)}"
+                                    },
+                                )
                                 .setNegativeButton("Cancel") { dialog, _ ->
                                     dialog.dismiss()
                                 }
@@ -75,66 +78,69 @@ fun SettingsScreen(
                         }) {
                             Text("Change Color")
                         }
-                    }
+                    },
                 )
             }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SettingsSection(title = "About") {
-                SettingItem(
+            settingsSection(title = "About") {
+                settingItem(
                     title = "Version 1",
                     description = "1.0.0",
-                    action = {}
+                    action = {},
                 )
             }
         }
     }
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
-private fun SettingsSection(
+private fun settingsSection(
     title: String,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp),
     ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         )
         content()
     }
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
-private fun SettingItem(
+private fun settingItem(
     title: String,
     description: String? = null,
-    action: @Composable () -> Unit
+    action: @Composable () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
             if (description != null) {
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 )
             }
         }

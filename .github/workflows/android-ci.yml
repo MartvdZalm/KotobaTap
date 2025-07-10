@@ -3,10 +3,10 @@ name: Android CI
 on:
   pull_request:
     branches:
-      - main
+      - master
   push:
     branches:
-      - main
+      - master
 
 jobs:
   code-style:
@@ -14,12 +14,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          distribution: 'adopt'
+          java-version: '17'
 
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - run: |
+          chmod +x gradlew
+          ./gradlew ktlintCheck

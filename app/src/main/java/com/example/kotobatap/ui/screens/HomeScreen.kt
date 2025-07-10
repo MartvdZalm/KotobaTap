@@ -1,5 +1,6 @@
 package com.example.kotobatap.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -13,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -36,15 +36,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import com.example.kotobatap.ui.components.AppHeader
+import com.example.kotobatap.ui.components.appHeader
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("ComposableNaming")
 @Composable
-fun HomeScreen(
+fun homeScreen(
     navController: NavHostController,
     onNavigateToReader: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var url by remember { mutableStateOf("") }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -57,7 +57,17 @@ fun HomeScreen(
                 NavigationDrawerItem(
                     label = { Text("Home") },
                     selected = true,
-                    onClick = { scope.launch { drawerState.close() } }
+                    onClick = { scope.launch { drawerState.close() } },
+                )
+                NavigationDrawerItem(
+                    label = { Text("Dictionary") },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            navController.navigate("dictionary")
+                        }
+                    },
                 )
                 NavigationDrawerItem(
                     label = { Text("Settings") },
@@ -67,45 +77,47 @@ fun HomeScreen(
                             drawerState.close()
                             navController.navigate("settings")
                         }
-                    }
+                    },
                 )
             }
-        }
+        },
     ) {
         Scaffold(
             topBar = {
-                AppHeader(
+                appHeader(
                     title = "KotobaTap",
-                    onMenuClick = { scope.launch { drawerState.open() } }
+                    onMenuClick = { scope.launch { drawerState.open() } },
                 )
             },
             bottomBar = {
-                AboutSection()
-            }
+                aboutSection()
+            },
         ) { innerPadding ->
             Column(
-                modifier = modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(innerPadding)
-                    .padding(16.dp)
+                modifier =
+                    modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(innerPadding)
+                        .padding(16.dp),
             ) {
                 OutlinedTextField(
                     value = url,
                     onValueChange = { url = it },
                     label = { Text("Article URL") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Button(
                     onClick = {
-                        val formattedUrl = if (!url.startsWith("http")) {
-                            "https://$url"
-                        } else {
-                            url
-                        }
+                        val formattedUrl =
+                            if (!url.startsWith("http")) {
+                                "https://$url"
+                            } else {
+                                url
+                            }
                         onNavigateToReader(Uri.encode(formattedUrl))
                     },
                     enabled = url.isNotBlank(),
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier.padding(top = 16.dp),
                 ) {
                     Text("Read Article")
                 }
@@ -113,36 +125,40 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider()
 
-                QuickAccessPanel(onNavigate = onNavigateToReader)
+                quickAccessPanel(onNavigate = onNavigateToReader)
             }
         }
     }
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun QuickAccessPanel(onNavigate: (String) -> Unit) {
+fun quickAccessPanel(onNavigate: (String) -> Unit) {
     Column(modifier = Modifier.padding(vertical = 16.dp)) {
         Text(
             text = "Quick Access",
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
-        val quickLinks = listOf(
-            "NHK Easy News" to "https://www3.nhk.or.jp/news/easy/",
-            "NHK News" to "https://www3.nhk.or.jp/news/"
-        )
+        val quickLinks =
+            listOf(
+                "NHK Easy News" to "https://www3.nhk.or.jp/news/easy/",
+                "NHK News" to "https://www3.nhk.or.jp/news/",
+            )
 
         quickLinks.forEach { (name, url) ->
             Button(
                 onClick = { onNavigate(url) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
             ) {
                 Text(name)
             }
@@ -150,15 +166,16 @@ fun QuickAccessPanel(onNavigate: (String) -> Unit) {
     }
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun AboutSection() {
+fun aboutSection() {
     val context = LocalContext.current
 
     Column(
         Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("This app is 100% free and open-source", style = MaterialTheme.typography.bodySmall)
 
@@ -170,11 +187,12 @@ fun AboutSection() {
                 val intent = Intent(Intent.ACTION_VIEW, repoUrl.toUri())
                 context.startActivity(intent)
             },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.primary
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         ) {
             Text("View on GitHub")
         }

@@ -1,5 +1,6 @@
 package com.example.kotobatap.ui.screens
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Handler
@@ -21,29 +22,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.kotobatap.R
 import com.example.kotobatap.helpers.ReaderHelper
-import com.example.kotobatap.ui.components.AppHeader
+import com.example.kotobatap.ui.components.appHeader
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.net.URLEncoder
 import kotlin.math.min
 
+@SuppressLint("ComposableNaming")
 @Composable
-fun ReaderScreen(
+fun readerScreen(
     url: String,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
-            AppHeader(
+            appHeader(
                 title = "Reading Mode",
                 showBackButton = true,
-                onBackClick = onBack
+                onBackClick = onBack,
             )
-        }
+        },
     ) { padding ->
         AndroidView(
             factory = { context ->
@@ -54,34 +56,38 @@ fun ReaderScreen(
                     addJavascriptInterface(jishoInterface, "Android")
                     webChromeClient = JishoChromeClient(jishoInterface)
 
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                            try {
-                                val inputStream = context.assets.open("js/highlightWords.js")
-                                val reader = inputStream.bufferedReader()
-                                val jsCode = reader.use { it.readText() }
-                                view?.evaluateJavascript(jsCode, null)
-                                view?.evaluateJavascript(
-                                    "changeHighlightingColor('${ReaderHelper.highlightingColor}')",
-                                    null
-                                )
-                            } catch (e: Exception) {
-                                e.printStackTrace()
+                    webViewClient =
+                        object : WebViewClient() {
+                            override fun onPageFinished(
+                                view: WebView?,
+                                url: String?,
+                            ) {
+                                super.onPageFinished(view, url)
+                                try {
+                                    val inputStream = context.assets.open("js/highlightWords.js")
+                                    val reader = inputStream.bufferedReader()
+                                    val jsCode = reader.use { it.readText() }
+                                    view?.evaluateJavascript(jsCode, null)
+                                    view?.evaluateJavascript(
+                                        "changeHighlightingColor('${ReaderHelper.highlightingColor}')",
+                                        null,
+                                    )
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         }
-                    }
                     loadUrl(url)
                 }
             },
-            modifier = modifier.padding(padding)
+            modifier = modifier.padding(padding),
         )
     }
 }
 
 class JishoInterface(
     private val context: Context,
-    private val webView: WebView
+    private val webView: WebView,
 ) {
     private val client = OkHttpClient()
 
@@ -92,7 +98,7 @@ class JishoInterface(
                 val url = "https://jisho.org/api/v1/search/words?keyword=${
                     URLEncoder.encode(
                         word,
-                        "UTF-8"
+                        "UTF-8",
                     )
                 }"
                 val request = Request.Builder().url(url).build()
@@ -136,7 +142,6 @@ class JishoInterface(
                     }
                 }
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -144,8 +149,14 @@ class JishoInterface(
         return Pair(meanings, hiragana)
     }
 
-    private fun showWordDetailsDialog(word: String, meanings: List<String>, hiragana: String?) {
-        Handler(Looper.getMainLooper()).post {
+    private fun showWordDetailsDialog(
+        word: String,
+        meanings: List<String>,
+        hiragana: String?,
+    ) {
+        Handler(
+            Looper.getMainLooper(),
+        ).post {
             val builder = AlertDialog.Builder(context)
             val inflater = LayoutInflater.from(context)
             val dialogView = inflater.inflate(R.layout.dialog_word_details, null)
@@ -159,11 +170,12 @@ class JishoInterface(
 
             tvWord.text = word
             tvHiragana.text = hiragana ?: "No reading available"
-            tvMeanings.text = if (meanings.isNotEmpty()) {
-                "• " + meanings.joinToString("\n• ")
-            } else {
-                "No definitions found"
-            }
+            tvMeanings.text =
+                if (meanings.isNotEmpty()) {
+                    "• " + meanings.joinToString("\n• ")
+                } else {
+                    "No definitions found"
+                }
 
             val dialog = builder.create()
 
@@ -190,14 +202,14 @@ class JishoInterface(
 }
 
 private class JishoChromeClient(
-    private val jishoInterface: JishoInterface
+    private val jishoInterface: JishoInterface,
 ) : WebChromeClient() {
     override fun onJsPrompt(
         view: WebView,
         url: String,
         message: String,
         defaultValue: String,
-        result: JsPromptResult
+        result: JsPromptResult,
     ): Boolean {
         if (message == "JISHO_LOOKUP") {
             jishoInterface.lookupWord(defaultValue)
