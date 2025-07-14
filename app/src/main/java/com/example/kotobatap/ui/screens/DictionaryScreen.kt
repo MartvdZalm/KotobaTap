@@ -30,7 +30,7 @@ import org.json.JSONObject
 fun dictionaryScreen(onBack: () -> Unit) {
     val viewModel: JishoViewModel = viewModel()
     var userInput by remember { mutableStateOf("") }
-    val stateApi by viewModel.searchState.collectAsState()
+    val stateApi by viewModel.apiState.collectAsState()
 
     Scaffold(
         topBar = {

@@ -15,20 +15,20 @@ import java.net.URLEncoder
 class JishoViewModel : ViewModel() {
     private val client = OkHttpClient()
     private val jishoSearchUrl = "https://jisho.org/api/v1/search/words?keyword=%s"
-    private val _apiState = MutableStateFlow<ApiState>(ApiState.Idle)
-    val searchState: StateFlow<ApiState> = _apiState.asStateFlow()
+    private val state = MutableStateFlow<ApiState>(ApiState.Idle)
+    val apiState: StateFlow<ApiState> = state.asStateFlow()
 
     fun search(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _apiState.value = ApiState.Loading
+            state.value = ApiState.Loading
             try {
                 val encodedQuery = URLEncoder.encode(query, "UTF-8").replace("+", "%20")
                 val url = String.format(jishoSearchUrl, encodedQuery)
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
-                _apiState.value = ApiState.Success(response.body?.string() ?: "")
+                state.value = ApiState.Success(response.body?.string() ?: "")
             } catch (e: Exception) {
-                _apiState.value = ApiState.Error(e.message ?: "Unknown error")
+                state.value = ApiState.Error(e.message ?: "Unknown error")
             }
         }
     }
