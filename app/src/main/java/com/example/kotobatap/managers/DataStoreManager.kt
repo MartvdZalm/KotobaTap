@@ -78,6 +78,35 @@ object DataStoreManager {
         }
     }
 
+    suspend fun putListValue(
+        context: Context,
+        key: String,
+        value: List<String>,
+    ) {
+        context.dataStore.edit { preferences ->
+            preferences[stringPreferencesKey(key)] = value.joinToString(",")
+        }
+    }
+
+    fun getListValue(
+        context: Context,
+        key: String,
+        defaultValue: List<String> = emptyList(),
+    ): Flow<List<String>> {
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                val storedValue = preferences[stringPreferencesKey(key)] ?: return@map defaultValue
+                storedValue.split(",")
+            }
+    }
+
     fun getStringValue(
         context: Context,
         key: String,
