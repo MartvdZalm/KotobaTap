@@ -20,6 +20,23 @@
         android:text="@string/hiragana"
         android:layout_marginTop="8dp" />
 
+    <TextView
+        android:id="@+id/tvType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvContext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,14 +50,36 @@
             android:text="@string/meanings"/>
     </ScrollView>
 
-    <Button
-        android:id="@+id/closeButton"
-        android:layout_width="96dp"
-        android:layout_height="36dp"
-        android:text="@string/close"
-        android:textColor="@android:color/white"
-        android:background="@drawable/button_background"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp" />
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/correctHighlightingButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="96dp"
+            android:layout_height="36dp"
+            android:background="@drawable/button_green"
+            android:text="@string/correct_highlighting"
+            android:textColor="@android:color/white" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/closeButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="96dp"
+            android:layout_height="36dp"
+            android:background="@drawable/button_red"
+            android:text="@string/close"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
 </LinearLayout>

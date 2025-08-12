@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -49,6 +50,7 @@ ktlint {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("com.github.skydoves:colorpickerview:2.3.0")
     implementation("com.google.android.material:material:1.12.0")

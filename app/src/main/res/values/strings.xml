@@ -8,4 +8,9 @@
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="system_default">System Default</string>
+    <string name="correct_highlighting">Correct Highlighting</string>
+    <string name="if_the_word_below_is_incorrectly_highlighted_please_edit_it">If the word below is incorrectly highlighted, please edit it.</string>
+    <string name="enter_the_correct_word_or_phrase">Enter the correct word or phrase</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 </resources>

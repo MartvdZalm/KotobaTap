@@ -143,6 +143,24 @@ object DataStoreManager {
             }
     }
 
+    fun getFloatValue(
+        context: Context,
+        key: String,
+        defaultValue: Float = 0f,
+    ): Flow<Float> {
+        return context.dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[floatPreferencesKey(key)] ?: defaultValue
+            }
+    }
+
     fun getBooleanValue(
         context: Context,
         key: String,
